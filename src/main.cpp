@@ -101,14 +101,14 @@ void statuspinCallback(cmd* c){
 
 void helpCallback(cmd* c){
     Serial.write(S("Help:"));
-    Serial.write(S("\th: This help"));
-    Serial.write(S("\tp: Passtrhough mode between PC and RX 10 & TX 11"));
-    Serial.write(S("\te: Echo server on the HC-05"));
-    Serial.write(S("\tm: Configure connected HC-05 as master"));
-    Serial.write(S("\ts: Configure connected HC-05 as slave"));
-    Serial.write(S("\tw: Print value of the pin connected to HC-STATUS"));
-    Serial.write(S("\tn: Change name of the HC-05"));
-    Serial.write(S("\tb: Change baudrate of HC-05"));
+    Serial.write(S("\thelp: This help"));
+    Serial.write(S("\tpass: Passtrhough mode between PC and RX 10 & TX 11"));
+    Serial.write(S("\techo: Echo server on the HC-05"));
+    Serial.write(S("\tmaster: Configure connected HC-05 as master"));
+    Serial.write(S("\tslave: Configure connected HC-05 as slave"));
+    Serial.write(S("\tstatuspin: Print value of the pin connected to HC-STATUS"));
+    Serial.write(S("\tname: Change name of the HC-05"));
+    Serial.write(S("\tbaudrate: Change baudrate of HC-05"));
 }
 
 void setup() {
