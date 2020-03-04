@@ -113,9 +113,10 @@ void helpCallback(cmd* c){
 
 void setup() {
   	Serial.begin(BAUDRATE);
+    // give user 20 seconds to insert command
+    Serial.setTimeout(20000);
   	Peripheral.begin(BAUDRATE);
-  	pinMode(LED_BUILTIN, OUTPUT);
-  	digitalWrite(LED_BUILTIN, LOW);
+    Peripheral.setTimeout(20000);
 
   	pinMode(HC_STATUS, INPUT);
   	pinMode(HC_RESET, OUTPUT);
@@ -138,6 +139,7 @@ void setup() {
     // ping.addArgument("number");
     // ping.addPositionalArgument("str", "pong");
     // ping.addFlagArgument("c");
+    Serial.print("# ");
 }
 
 void loop() {
@@ -146,12 +148,9 @@ void loop() {
         // Read out string from the serial monitor
         String input = Serial.readStringUntil('\n');
 
-        // Echo the user input
-        Serial.print("# ");
-        Serial.println(input);
-
         // Parse the user input into the CLI
         cli.parse(input);
+        Serial.print("# ");
     }
 
     if (cli.errored()) {
@@ -165,5 +164,6 @@ void loop() {
             Serial.print(cmdError.getCommand().toString());
             Serial.println("\"?");
         }
+        Serial.print("# ");
     }
 }
