@@ -5,10 +5,10 @@
 #define STR(x) #x
 #define S(A) A STR(\r\n)
 
-#define ATMODEPIN 1
-#define HC_STATUS 4
-#define HC_RESET 3
-#define BAUDRATE 38400
+#define HC_ATMODE 3
+#define HC_STATUS 5
+#define HC_POWER 4
+#define BAUDRATE 115200
 
 // Pin 10 of Arduino goes to TX (pin 0) of HC-05
 // Pin 11 of Arduino goes to RX (pin 1) of HC-05
@@ -19,6 +19,7 @@ SimpleCLI cli;
 Command help;
 Command pass;
 Command echo;
+Command atmode;
 Command master;
 Command slave;
 Command statuspin;
@@ -43,8 +44,7 @@ void echoCallback(cmd* c){
 
     while(true){
         if (Peripheral.available()) {
-            Peripheral.write("R: ");
-            Peripheral.write(Peripheral.read());
+            Peripheral.write(Peripheral.readStringUntil('\n').c_str());
         }
 
         if (Serial.available()) {
@@ -75,8 +75,20 @@ void passCallback(cmd* c){
     }
 }
 
+void atmodeCallback(cmd* c){
+	Serial.write(S("atmodeCallback\n"));
+
+  	digitalWrite(HC_POWER, LOW);
+    delay(1000);
+  	digitalWrite(HC_ATMODE, HIGH);
+  	digitalWrite(HC_POWER, HIGH);
+	// Serial.write(S("Please, reset the HC-05 module only!\n"));
+
+    passCallback(c);
+}
+
 void masterCallback(cmd* c){
-	Serial.write(S("nameCallback\n"));
+	Serial.write(S("masterCallback\n"));
 }
 
 void slaveCallback(cmd* c){
@@ -93,10 +105,10 @@ void baudrateCallback(cmd* c){
 
 void statuspinCallback(cmd* c){
 	Serial.write(S("statuspinCallback\n"));
-    // int status = digitalRead(HC_STATUS);
-    // Serial.write("STATUS of the HC is ");
-    // Serial.write(status + 0x30);
-    // Serial.write("\r\n");
+    int status = digitalRead(HC_STATUS);
+    Serial.write("STATUS pin of the HC is ");
+    Serial.write(status + 0x30);
+    Serial.write("\n");
 }
 
 void helpCallback(cmd* c){
@@ -118,8 +130,13 @@ void setup() {
   	Peripheral.begin(BAUDRATE);
     Peripheral.setTimeout(20000);
 
+  	pinMode(LED_BUILTIN, OUTPUT);
+  	pinMode(HC_ATMODE, OUTPUT);
   	pinMode(HC_STATUS, INPUT);
-  	pinMode(HC_RESET, OUTPUT);
+  	pinMode(HC_POWER, OUTPUT);
+
+  	digitalWrite(LED_BUILTIN, LOW);
+  	digitalWrite(HC_POWER, HIGH);
 
   	Serial.write("HCTOOLS. Version: ");
   	Serial.write(VERSION);
@@ -130,6 +147,7 @@ void setup() {
 	help = cli.addCommand("help", helpCallback);
 	pass = cli.addCommand("pass", passCallback);
 	echo = cli.addCommand("echo", echoCallback);
+	atmode = cli.addCommand("atmode", atmodeCallback);
 	master = cli.addCommand("master", masterCallback);
 	slave = cli.addCommand("slave", slaveCallback);
 	statuspin = cli.addCommand("statuspin", statuspinCallback);
