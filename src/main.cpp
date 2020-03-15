@@ -40,7 +40,8 @@ void errorCallback(cmd_error* e) {
 }
 
 void echoCallback(cmd* c){
-	Serial.write(S("echoCallback\n"));
+	Serial.write(S("Echoing every received character. CTRL-D to stop it."));
+    Peripheral.write(S("I will resend you everything"));
 
     while(true){
         if (Peripheral.available()) {
@@ -49,17 +50,20 @@ void echoCallback(cmd* c){
 
         if (Serial.available()) {
             char c = Serial.read();
-            if(c == 0x03){
+            if(c == 0x04){
                 break;
             }
             Peripheral.write(c);
         }
     }
+    
+    // Reset line
+    Serial.write('\r');
 }
 
 void passCallback(cmd* c){
-	Serial.write(S("passCallback\n"));
-
+	Serial.write(S("Passing input stream to the HC-05. CTRL-D to stop it."));
+	Serial.write(S("Try 'AT' command to see if HC-05 will respond with 'OK'"));
     while(true){
         if (Peripheral.available()) {
             Serial.write(Peripheral.read());
@@ -67,44 +71,113 @@ void passCallback(cmd* c){
 
         if (Serial.available()) {
             char c = Serial.read();
-            if(c == 0x03){
+            if(c == 0x04){
                 break;
             }
             Peripheral.write(c);
         }
     }
+
+    // Reset line
+    Serial.write('\r');
 }
 
-void atmodeCallback(cmd* c){
-	Serial.write(S("atmodeCallback\n"));
-
+void switchToAT(){
   	digitalWrite(HC_POWER, LOW);
     delay(1000);
   	digitalWrite(HC_ATMODE, HIGH);
   	digitalWrite(HC_POWER, HIGH);
-	// Serial.write(S("Please, reset the HC-05 module only!\n"));
+}
 
+void switchToNormal(){
+  	digitalWrite(HC_ATMODE, LOW);
+  	digitalWrite(HC_POWER, HIGH);
+    delay(1000);
+  	digitalWrite(HC_POWER, LOW);
+}
+
+void atmodeCallback(cmd* c){
+	Serial.write(S("Switching HC-05 into AT mode"));
+
+    switchToAT();
     passCallback(c);
+    switchToNormal();
 }
 
 void masterCallback(cmd* c){
-	Serial.write(S("masterCallback\n"));
+    Command cmd(c);
+
+	Serial.write(S("Configuring HC-05 module as master"));
+
+    // Process arguments
+    Argument nameArg = cmd.getArgument("name");
+    String name = nameArg.getValue();
+    String setNameCmd = "AT+NAME=" + name + "\r\n";
+
+    Argument slaveMacArg = cmd.getArgument("slavemac");
+    String slaveMac = slaveMacArg.getValue();
+    String setSlaveMacCmd = "AT+BIND=" + slaveMac + "\r\n";
+    // "AT+BIND=0013,EF,000304"
+
+    switchToAT();
+
+    Peripheral.write(S("AT+ROLE=1"));
+    delay(1000);
+    Peripheral.write(S("AT+UART=115200,1,0"));
+    delay(1000);
+    Peripheral.write(setNameCmd.c_str());
+    delay(1000);
+    Peripheral.write(S("AT+CMODE=0"));
+    delay(1000);
+    Peripheral.write(setSlaveMacCmd.c_str());
+    delay(1000);
+    Peripheral.write(S("AT+CLASS=1F00"));
+    delay(1000);
+    Peripheral.write(S("AT+INQM=1,2,48"));
+    delay(1000);
+    switchToNormal();
 }
 
 void slaveCallback(cmd* c){
-	Serial.write(S("slaveCallback\n"));
+    Command cmd(c);
+
+	Serial.write(S("Configuring HC-05 module as slave"));
+
+    // Process arguments
+    Argument nameArg = cmd.getArgument("name");
+    String name = nameArg.getValue();
+
+    String setNameCmd = "AT+NAME=" + name + "\r\n";
+
+    switchToAT();
+
+    Peripheral.write(S("AT"));
+    delay(1000);
+    Peripheral.write(S("AT+ROLE=0"));
+    delay(1000);
+    Peripheral.write(S("AT+UART=115200,1,0"));
+    delay(1000);
+    Peripheral.write(setNameCmd.c_str());
+    delay(1000);
+    switchToNormal();
 }
 
 void nameCallback(cmd* c){
-	Serial.write(S("nameCallback\n"));
+	Serial.write(S("Set HC-05 name to ''"));
+    atmodeCallback(c);
+
+    Peripheral.write(S("AT+NAME=Slavy"));
 }
 
 void baudrateCallback(cmd* c){
-	Serial.write(S("baudrateCallback\n"));
+	Serial.write(S("Set HC-05 baudrate to ''"));
+    atmodeCallback(c);
+
+    Peripheral.write(S("AT+UART=115200,1,0"));
 }
 
 void statuspinCallback(cmd* c){
-	Serial.write(S("statuspinCallback\n"));
+	Serial.write(S("Reading STATUS pin of the HC-05 moduel"));
     int status = digitalRead(HC_STATUS);
     Serial.write("STATUS pin of the HC is ");
     Serial.write(status + 0x30);
@@ -116,6 +189,7 @@ void helpCallback(cmd* c){
     Serial.write(S("\thelp: This help"));
     Serial.write(S("\tpass: Passtrhough mode between PC and RX 10 & TX 11"));
     Serial.write(S("\techo: Echo server on the HC-05"));
+    Serial.write(S("\tatmode: switch HC-05 into AT mode and run passthrough"));
     Serial.write(S("\tmaster: Configure connected HC-05 as master"));
     Serial.write(S("\tslave: Configure connected HC-05 as slave"));
     Serial.write(S("\tstatuspin: Print value of the pin connected to HC-STATUS"));
@@ -137,6 +211,7 @@ void setup() {
 
   	digitalWrite(LED_BUILTIN, LOW);
   	digitalWrite(HC_POWER, HIGH);
+  	digitalWrite(HC_ATMODE, LOW);
 
   	Serial.write("HCTOOLS. Version: ");
   	Serial.write(VERSION);
@@ -156,9 +231,12 @@ void setup() {
 	name = cli.addCommand("name", nameCallback);
 	baudrate = cli.addCommand("baudrate", baudrateCallback);
 
-    // ping.addArgument("number");
-    // ping.addPositionalArgument("str", "pong");
-    // ping.addFlagArgument("c");
+    name.addPositionalArgument("name");
+    baudrate.addPositionalArgument("baudrate");
+    master.addPositionalArgument("slavemac");
+    master.addPositionalArgument("name");
+    slave.addPositionalArgument("name");
+
     Serial.print("# ");
 }
 
