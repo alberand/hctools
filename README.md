@@ -22,3 +22,8 @@ Commands:
 * **name** - change Bluetooth name of the module.                  
 * **baudrate** - change baudrate of the module. This baudrate is used whe
   module communicates with Arduino.
+
+### References:
+
+* [Platformio](https://platformio.org/)
+* [HC-05](https://www.aliexpress.com/wholesale?catId=0&SearchText=HC-05+Bluetooth)
