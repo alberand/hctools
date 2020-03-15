@@ -140,7 +140,9 @@ void setup() {
 
   	Serial.write("HCTOOLS. Version: ");
   	Serial.write(VERSION);
-  	Serial.write("\r\n");
+  	Serial.write(" (");
+  	Serial.write(COMMIT);
+  	Serial.write(")\r\n");
 
     cli.setOnError(errorCallback); // Set error Callback
 	// Add commands
