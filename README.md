@@ -4,7 +4,7 @@ This is tool for configuring and communicationg with cheap Bluetooth modules
 HC-05. This firmware was mainly tested on Arduino Nano but should work on any
 Arduino.
 
-![Schematics](./schematics.png) <!-- .element style="width: 600px; marign: 30px 0 30px 173px;;" -->
+![Schematics](./schematics.png) <!-- .element style="width: 600px; margin: 30px 0 30px 173px;" -->
 
 ### Interface
 
