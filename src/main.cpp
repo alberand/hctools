@@ -54,6 +54,7 @@ void echoCallback(cmd* c){
                 break;
             }
             Peripheral.write(c);
+            Serial.write(c);
         }
     }
     
