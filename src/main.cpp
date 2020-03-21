@@ -8,7 +8,7 @@
 #define HC_ATMODE 3
 #define HC_STATUS 5
 #define HC_POWER 4
-#define BAUDRATE 115200
+#define BAUDRATE 38400
 
 // Pin 10 of Arduino goes to TX (pin 0) of HC-05
 // Pin 11 of Arduino goes to RX (pin 1) of HC-05
