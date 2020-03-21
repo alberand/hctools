@@ -6,9 +6,7 @@ Arduino.
 
 ![Schematics](./schematics.png)
 
-### Interface
-
-Commands:
+### Commands
 
 * **echo** - run echo server. It is useful to check if your module is working.
   You run this command, connect to the module with your phone or PC and start
