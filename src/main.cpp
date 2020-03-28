@@ -84,10 +84,10 @@ void passCallback(cmd* c){
 }
 
 void switchToAT(){
-  	digitalWrite(HC_POWER, LOW);
+  	digitalWrite(HC_POWER, HIGH);
     delay(1000);
   	digitalWrite(HC_ATMODE, HIGH);
-  	digitalWrite(HC_POWER, HIGH);
+  	digitalWrite(HC_POWER, LOW);
 }
 
 void switchToNormal(){
@@ -211,7 +211,7 @@ void setup() {
   	pinMode(HC_POWER, OUTPUT);
 
   	digitalWrite(LED_BUILTIN, LOW);
-  	digitalWrite(HC_POWER, HIGH);
+  	digitalWrite(HC_POWER, LOW);
   	digitalWrite(HC_ATMODE, LOW);
 
   	Serial.write("HCTOOLS. Version: ");
