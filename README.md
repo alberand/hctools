@@ -32,6 +32,6 @@ Arduino.
   used when module communicates with Arduino.
 
 ### References:
-
+* [How to connect HC-05 to Linux PC](https://alberand.github.io/hc-05-linux.html)
 * [Platformio](https://platformio.org/)
 * [HC-05](https://www.aliexpress.com/wholesale?catId=0&SearchText=HC-05+Bluetooth)
