@@ -18,15 +18,16 @@ Arduino.
   communicate with Bluetooth module without any additional hardware (with the
   exception of Arduino of course). You can test if it works by sending `AT`
   command which should be answered with `OK`.
-* **master <MAC-of-slave\> <name\>** - configure connected HC-05 module as
+* **master <MAC-of-slave\> <name\> <baudrate\>** - configure connected HC-05 module as
   Bluetooth master. It has two parameters. The first one is MAC address of the
   bluetooth device to which you want your module to connect immediately after
   boot. Note that MAC address should be in the following form `1234:12:123456` -
   not like classical one with lot of `:`. The second parameter is just Bluetooth
   name of your HC-05 module. Pretty useful to distinguish it from other HC-05
-  slaves.
-* **slave <name\>** - configure connected HC-05 module as Bluetooth slave. The
-  same as for master you can configured name of the module.
+  slaves. The last argument is `baudrate` of the UART.
+* **slave <name\> <baudrate\>** - configure connected HC-05 module as Bluetooth
+  slave. The same as for master you can configured name of the module. The last
+  argument is `baudrate` of the UART.
 * **name <name\>** - change Bluetooth name of the module. 
 * **baudrate <baudrate\>** - change baudrate of the module. This baudrate is
   used when module communicates with Arduino.

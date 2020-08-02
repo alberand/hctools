@@ -120,11 +120,15 @@ void masterCallback(cmd* c){
     String setSlaveMacCmd = "AT+BIND=" + slaveMac + "\r\n";
     // "AT+BIND=0013,EF,000304"
 
+    Argument baudrateArg = cmd.getArgument("baudrate");
+    String baudrate = baudrateArg.getValue();
+    String setBaudRateCmd = "AT+UART=" + baudrate + ",1,0\r\n";
+
     switchToAT();
 
     Peripheral.write(S("AT+ROLE=1"));
     delay(1000);
-    Peripheral.write(S("AT+UART=115200,1,0"));
+    Peripheral.write(setBaudRateCmd.c_str());
     delay(1000);
     Peripheral.write(setNameCmd.c_str());
     delay(1000);
@@ -147,8 +151,11 @@ void slaveCallback(cmd* c){
     // Process arguments
     Argument nameArg = cmd.getArgument("name");
     String name = nameArg.getValue();
-
     String setNameCmd = "AT+NAME=" + name + "\r\n";
+
+    Argument baudrateArg = cmd.getArgument("baudrate");
+    String baudrate = baudrateArg.getValue();
+    String setBaudRateCmd = "AT+UART=" + baudrate + ",1,0\r\n";
 
     switchToAT();
 
@@ -156,7 +163,7 @@ void slaveCallback(cmd* c){
     delay(1000);
     Peripheral.write(S("AT+ROLE=0"));
     delay(1000);
-    Peripheral.write(S("AT+UART=115200,1,0"));
+    Peripheral.write(setBaudRateCmd.c_str());
     delay(1000);
     Peripheral.write(setNameCmd.c_str());
     delay(1000);
@@ -164,17 +171,29 @@ void slaveCallback(cmd* c){
 }
 
 void nameCallback(cmd* c){
+    Command cmd(c);
+
 	Serial.write(S("Set HC-05 name to ''"));
     atmodeCallback(c);
 
-    Peripheral.write(S("AT+NAME=Slavy"));
+    Argument nameArg = cmd.getArgument("name");
+    String name = nameArg.getValue();
+    String setNameCmd = "AT+NAME=" + name + "\r\n";
+
+    Peripheral.write(setNameCmd.c_str());
 }
 
 void baudrateCallback(cmd* c){
+    Command cmd(c);
+
 	Serial.write(S("Set HC-05 baudrate to ''"));
     atmodeCallback(c);
 
-    Peripheral.write(S("AT+UART=115200,1,0"));
+    Argument baudrateArg = cmd.getArgument("baudrate");
+    String baudrate = baudrateArg.getValue();
+    String setBaudRateCmd = "AT+UART=" + baudrate + ",1,0\r\n";
+
+    Peripheral.write(setBaudRateCmd.c_str());
 }
 
 void statuspinCallback(cmd* c){
@@ -236,7 +255,9 @@ void setup() {
     baudrate.addPositionalArgument("baudrate");
     master.addPositionalArgument("slavemac");
     master.addPositionalArgument("name");
+    master.addPositionalArgument("baudrate");
     slave.addPositionalArgument("name");
+    slave.addPositionalArgument("baudrate");
 
     Serial.print("# ");
 }
