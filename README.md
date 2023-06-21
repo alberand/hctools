@@ -1,4 +1,4 @@
-### HC-05 tool
+# HC-05 Configuration tool
 
 This is tool for configuring and communicationg with cheap Bluetooth modules
 HC-05. This firmware was mainly tested on Arduino Nano but should work on any
